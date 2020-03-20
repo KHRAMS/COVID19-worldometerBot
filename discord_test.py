@@ -9,6 +9,7 @@ import requests as r
 from bs4 import BeautifulSoup
 import urllib.request
 import re
+import datetime
 
 req = urllib.request.urlopen('https://www.worldometers.info/coronavirus')
 page = BeautifulSoup(req.read().decode('utf8'), 'html.parser')
@@ -199,8 +200,10 @@ async def on_message(message):
                 # print(jsonFile)
                 for i in jsonFile:
                     print(i['url'])
-                    # print(i[])
-                    tempbed=discord.Embed(timestamp= i['publishDate'], author=i['url'], url = i['url'], colour =discord.Colour.blue())
+                    # print(i[])mport datetime
+
+
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S.%f"), author=i['url'], url = i['url'], colour =discord.Colour.blue())
 
                     await message.channel.send(msg, embed =tempbed )
                 # await message.channel.send(msg, embed = embed)
