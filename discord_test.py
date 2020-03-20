@@ -193,7 +193,7 @@ async def on_message(message):
                 # to_send+= "There are " + str(temp['NewCases'].item()) + " new cases in " + temp['Country,Other'].item()
                 msg =  ""
                 await message.channel.send(msg, embed = embed)
-                response = r.get("https://api.newsriver.io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22&sortBy=discoverDate&sortOrder=DESC&limit=3", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
+                response = r.get("https://api.newsriver.io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22&sortBy=discoverDate&sortOrder=DESC&limit=2", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
                 # print(response.text)
                 jsonFile = response.json()
                 # print(jsonFile[0])
@@ -203,7 +203,7 @@ async def on_message(message):
                     # print(i[])mport datetime
 
 
-                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title=" ", description= "["+i['title']+"]("+i['url']+")", url= i['url'], author=i['website']['name'], colour =discord.Colour.blue())
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title="Breaking News", description= "["+i['title']+"]("+i['url']+")", url= i['url'], author=i['website']['name'], colour =discord.Colour.blue())
                     # tempbed.set_footer(text=i['highlight'])
 
                     await message.channel.send(msg, embed =tempbed )
