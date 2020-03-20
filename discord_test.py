@@ -203,7 +203,8 @@ async def on_message(message):
                     # print(i[])mport datetime
 
 
-                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), author=i['url'], url = i['url'], colour =discord.Colour.blue())
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), description=i['title'],author=i['url'], url = i['url'], colour =discord.Colour.blue())
+                    # tempbed.set_footer(text=i['highlight'])
 
                     await message.channel.send(msg, embed =tempbed )
                 # await message.channel.send(msg, embed = embed)
