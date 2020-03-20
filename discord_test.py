@@ -203,9 +203,9 @@ async def on_message(message):
                     # print(i[])mport datetime
                     print()
 
-                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title="Breaking News", description= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
                     # tempbed.set_footer(text=i['highlight'])
-                    tempbed.set_author(name=i['website']['name'])
+                    tempbed.set_footer(text=i['website']['name'])
                     await message.channel.send(msg, embed =tempbed )
                 # await message.channel.send(msg, embed = embed)
                 # await message.channel.send(msg, embed = embed)
