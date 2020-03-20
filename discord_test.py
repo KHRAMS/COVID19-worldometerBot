@@ -1,6 +1,6 @@
 import discord
 
-TOKEN = 'NjkwNTY5NTExNzUzMDg5MDk0.XnTdUQ.5lrzbDMhyI9MnivHL0v8k9Fs6-E'
+TOKEN = 'NjkwNTY5NTExNzUzMDg5MDk0.XnT8JQ.THoQRWcVrv7f5ZY9xxihZZKDp-c'
 
 client = discord.Client()
 import pandas as pd
