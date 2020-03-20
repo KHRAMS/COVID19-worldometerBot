@@ -177,7 +177,7 @@ async def on_message(message):
                 temp = df_countr[pd.Series(df_countr['Country,Other']).str.match(cmd[2], case=False).values]
                 embed = discord.Embed(title = 'CoVID19 data for ' + temp['Country,Other'].item(),
                                         colour =discord.Colour.blue())
-                embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category.")
+                embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category. Nones aren't necessarily 0s! There just might not be data for a category.")
                 print(temp)
                 # embed.set_author(name= 'CoVID19-Analytics')
                 embed.add_field(name = 'Total Cases', value= str(temp['TotalCases'].item())+ "(+"+ str(temp['NewCases'].item()) + ")")
@@ -202,7 +202,7 @@ async def on_message(message):
                 print(temp)
                 embed = discord.Embed(title = 'CoVID19 data for ' + state_string,
                                         colour =discord.Colour.blue())
-                embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category.")
+                embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category. Nones aren't necessarily 0s! There just might not be data for a category."")
                 print(temp)
                 # embed.set_author(name= 'CoVID19-Analytics')
                 embed.add_field(name = 'Total Cases', value= str(temp['TotalCases'].item())+ "(+"+ str(temp['NewCases'].item()) + ")")
