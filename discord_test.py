@@ -194,6 +194,7 @@ async def on_message(message):
                 df_st = df_state_dict.get(cmd[2].lower())
                 state_string = abbrev_us_state.get(cmd[3].lower())
                 temp = df_st[pd.Series(df_st.iloc[:,0]).str.match(state_string, case=False).values]
+                print(temp)
                 embed = discord.Embed(title = 'CoVID19 data for ' + temp[0].item(),
                                         colour =discord.Colour.blue())
                 embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category.")
