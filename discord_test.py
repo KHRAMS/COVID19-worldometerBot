@@ -202,7 +202,7 @@ async def on_message(message):
                 print(temp)
                 embed = discord.Embed(title = 'CoVID19 data for ' + state_string,
                                         colour =discord.Colour.blue())
-                embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category. Nones aren't necessarily 0s! There just might not be data for a category."")
+                embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category. Nones aren't necessarily 0s! There just might not be data for a category.")
                 print(temp)
                 # embed.set_author(name= 'CoVID19-Analytics')
                 embed.add_field(name = 'Total Cases', value= str(temp['TotalCases'].item())+ "(+"+ str(temp['NewCases'].item()) + ")")
