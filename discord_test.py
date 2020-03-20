@@ -200,7 +200,9 @@ async def on_message(message):
                 for i in jsonFile:
                     print(i['url'])
                     # print(i[])
-                    await message.channel.send(msg, embed = discord.Embed(title =i['url'], description=i['highlight'], url = i['url'], colour =discord.Colour.blue()))
+                    tempbed=discord.Embed(timestamp= i['publishDate'], author=i['url'], url = i['url'], colour =discord.Colour.blue())
+
+                    await message.channel.send(msg, embed =tempbed )
                 # await message.channel.send(msg, embed = embed)
                 # await message.channel.send(msg, embed = embed)
                 # await message.channel.send(msg, embed = embed)
