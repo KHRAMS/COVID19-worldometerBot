@@ -191,7 +191,16 @@ async def on_message(message):
                 embed.add_field(name = 'Recovered/Closed Case%', value= "{0:.2f}".format(((temp['TotalRecovered'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)) + "%")
                 # to_send+= "There are " + str(temp['NewCases'].item()) + " new cases in " + temp['Country,Other'].item()
                 msg =  ""
-            if(len(cmd) == 4):
+                response = r.get("https://api.newsriver.io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22&sortBy=discoverDate&sortOrder=DESC&limit=3", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
+                print(response.text)
+                jsonFile = response.json()
+                print(jsonFile)
+                await message.channel.send(msg, embed = embed)
+                # await message.channel.send(msg, embed = embed)
+                # await message.channel.send(msg, embed = embed)
+                # await message.channel.send(msg, embed = embed)
+
+            elif(len(cmd) == 4):
                 df_st = df_state_dict.get(cmd[2].lower())
                 state_string = abbrev_us_state.get(cmd[3].lower())
                 print(df_st)
@@ -210,8 +219,11 @@ async def on_message(message):
                 embed.add_field(name = 'Total Recovered', value= str(temp['TotalRecovered'].item()))
                 embed.add_field(name = 'Active Cases', value= str(temp['ActiveCases'].item()))
                 msg =  ""
+                await message.channel.send(msg, embed = embed)
 
-        await message.channel.send(msg, embed = embed)
+            else:
+                embed=None
+                await message.channel.send(msg, embed = embed)
 
 @client.event
 async def on_ready():
