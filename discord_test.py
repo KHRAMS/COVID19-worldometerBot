@@ -194,9 +194,10 @@ async def on_message(message):
                 response = r.get("https://api.newsriver.io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22&sortBy=discoverDate&sortOrder=DESC&limit=3", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
                 # print(response.text)
                 jsonFile = response.json()
-                print(jsonFile)
+                # print(jsonFile)
                 await message.channel.send(msg, embed = embed)
                 for i in jsonFile[0]:
+                    print(i)
                     await message.channel.send(msg, embed = discord.Embed(url = i['url'], colour =discord.Colour.blue()))
                 # await message.channel.send(msg, embed = embed)
                 # await message.channel.send(msg, embed = embed)
