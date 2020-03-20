@@ -203,7 +203,7 @@ async def on_message(message):
                     # print(i[])mport datetime
 
 
-                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S.%f"), author=i['url'], url = i['url'], colour =discord.Colour.blue())
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), author=i['url'], url = i['url'], colour =discord.Colour.blue())
 
                     await message.channel.send(msg, embed =tempbed )
                 # await message.channel.send(msg, embed = embed)
