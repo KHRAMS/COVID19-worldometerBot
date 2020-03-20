@@ -191,14 +191,14 @@ async def on_message(message):
                 embed.add_field(name = 'Recovered/Closed Case%', value= "{0:.2f}".format(((temp['TotalRecovered'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)) + "%")
                 # to_send+= "There are " + str(temp['NewCases'].item()) + " new cases in " + temp['Country,Other'].item()
                 msg =  ""
+                await message.channel.send(msg, embed = embed)
                 response = r.get("https://api.newsriver.io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22&sortBy=discoverDate&sortOrder=DESC&limit=3", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
                 # print(response.text)
                 jsonFile = response.json()
+                print(jsonFile[0])
                 # print(jsonFile)
-                await message.channel.send(msg, embed = embed)
-                for i in jsonFile[0]:
-                    print(i)
-                    await message.channel.send(msg, embed = discord.Embed(url = i['url'], colour =discord.Colour.blue()))
+                # for i in jsonFile[0]:
+                #     await message.channel.send(msg, embed = discord.Embed(url = i['url'], colour =discord.Colour.blue()))
                 # await message.channel.send(msg, embed = embed)
                 # await message.channel.send(msg, embed = embed)
                 # await message.channel.send(msg, embed = embed)
