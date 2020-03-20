@@ -74,6 +74,7 @@ for i in page.table.tbody.find_all('tr'):
         df_state = df_state[1:] #take the data less the header row
         df_state.columns = new_header #set the header row as the df header
         df_state.set_index(df_state.columns[0],inplace=True)
+        df_state.reset_index(inplace=True)
        # print(df_state)
         df_state_dict[country_name.lower()] = df_state
 
