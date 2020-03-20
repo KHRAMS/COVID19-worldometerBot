@@ -125,7 +125,7 @@ async def on_message(message):
                 embed.add_field(name = 'Active Cases', value= str(temp['ActiveCases'].item()))
                 embed.add_field(name = 'Critical Cases', value= str(temp['Serious,Critical'].item()))
                 embed.add_field(name = 'Total Cases per million', value= str(temp['Tot Cases/1M pop'].item()))
-                embed.add_field(name = 'Closed Cases', str(temp['TotalCases'].item() - temp['ActiveCases'].item()))
+                embed.add_field(name = 'Closed Cases', value= str(temp['TotalCases'].item() - temp['ActiveCases'].item()))
                 # to_send+= "There are " + str(temp['NewCases'].item()) + " new cases in " + temp['Country,Other'].item()
                 msg =  ""
 
