@@ -199,7 +199,7 @@ async def on_message(message):
                 # print(jsonFile[0])
                 # print(jsonFile)
                 for i in jsonFile:
-                    print(i['url'])
+                    # print(i['url'])
                     # print(i[])mport datetime
 
 
