@@ -193,6 +193,8 @@ async def on_message(message):
             if(len(cmd) == 4):
                 df_st = df_state_dict.get(cmd[2].lower())
                 state_string = abbrev_us_state.get(cmd[3].lower())
+                print(df_st)
+                print(state_string)
                 temp = df_st[pd.Series(df_st.iloc[:,0]).str.match(state_string, case=False).values]
                 print(temp)
                 embed = discord.Embed(title = 'CoVID19 data for ' + temp[0].item(),
