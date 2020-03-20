@@ -75,7 +75,7 @@ for i in page.table.tbody.find_all('tr'):
         df_state.columns = new_header #set the header row as the df header
         df_state.set_index(df_state.columns[0],inplace=True)
        # print(df_state)
-        df_state_dict[country_name] = df_state
+        df_state_dict[country_name.lower()] = df_state
 
 
 df_countr = pd.DataFrame(countries)
@@ -93,6 +93,66 @@ temp = df_countr.sum(0).tolist()
 temp[len(temp)-1] = None
 df_countr.loc["World"]  = temp
 df_countr.reset_index(inplace=True)
+us_state_abbrev = {
+    'Alabama': 'AL',
+    'Alaska': 'AK',
+    'Arizona': 'AZ',
+    'Arkansas': 'AR',
+    'California': 'CA',
+    'Colorado': 'CO',
+    'Connecticut': 'CT',
+    'Delaware': 'DE',
+    'District of Columbia': 'DC',
+    'Florida': 'FL',
+    'Georgia': 'GA',
+    'Hawaii': 'HI',
+    'Idaho': 'ID',
+    'Illinois': 'IL',
+    'Indiana': 'IN',
+    'Iowa': 'IA',
+    'Kansas': 'KS',
+    'Kentucky': 'KY',
+    'Louisiana': 'LA',
+    'Maine': 'ME',
+    'Maryland': 'MD',
+    'Massachusetts': 'MA',
+    'Michigan': 'MI',
+    'Minnesota': 'MN',
+    'Mississippi': 'MS',
+    'Missouri': 'MO',
+    'Montana': 'MT',
+    'Nebraska': 'NE',
+    'Nevada': 'NV',
+    'New Hampshire': 'NH',
+    'New Jersey': 'NJ',
+    'New Mexico': 'NM',
+    'New York': 'NY',
+    'North Carolina': 'NC',
+    'North Dakota': 'ND',
+    'Northern Mariana Islands':'MP',
+    'Ohio': 'OH',
+    'Oklahoma': 'OK',
+    'Oregon': 'OR',
+    'Palau': 'PW',
+    'Pennsylvania': 'PA',
+    'Puerto Rico': 'PR',
+    'Rhode Island': 'RI',
+    'South Carolina': 'SC',
+    'South Dakota': 'SD',
+    'Tennessee': 'TN',
+    'Texas': 'TX',
+    'Utah': 'UT',
+    'Vermont': 'VT',
+    'Virgin Islands': 'VI',
+    'Virginia': 'VA',
+    'Washington': 'WA',
+    'West Virginia': 'WV',
+    'Wisconsin': 'WI',
+    'Wyoming': 'WY',
+}
+abbrev_us_state = dict(map(reversed, us_state_abbrev.items()))
+abbrev_us_state ={key.lower() if type(key) == str else key: value for key, value in abbrev_us_state.items()}
+
 
 # Use this if necessary -->
 # df_countr.index = [x.lower() for x in df_countr.index.tolist()]
@@ -129,6 +189,20 @@ async def on_message(message):
                 embed.add_field(name = 'Death/Closed Case%', value= "{0:.2f}".format((temp['TotalDeaths'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)+ "%")
                 embed.add_field(name = 'Recovered/Closed Case%', value= "{0:.2f}".format(((temp['TotalRecovered'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)) + "%")
                 # to_send+= "There are " + str(temp['NewCases'].item()) + " new cases in " + temp['Country,Other'].item()
+                msg =  ""
+            if(len(cmd) == 4):
+                df_st = df_state_dict.get(cmd[2].lower())
+                state_string = abbrev_us_state.get(cmd[3].lower())
+                temp = df_st[pd.Series(df_st.iloc[:,0]).str.match(state_string, case=False).values]
+                embed = discord.Embed(title = 'CoVID19 data for ' + temp['Country,Other'].item(),
+                                        colour =discord.Colour.blue())
+                embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category.")
+                print(temp)
+                # embed.set_author(name= 'CoVID19-Analytics')
+                embed.add_field(name = 'Total Cases', value= str(temp['TotalCases'].item())+ "(+"+ str(temp['NewCases'].item()) + ")")
+                embed.add_field(name = 'Total Deaths', value= str(temp['TotalDeaths'].item())+ "(+"+ str(temp['NewDeaths'].item()) + ")")
+                embed.add_field(name = 'Total Recovered', value= str(temp['TotalRecovered'].item()))
+                embed.add_field(name = 'Active Cases', value= str(temp['ActiveCases'].item()))
                 msg =  ""
 
         await message.channel.send(msg, embed = embed)
