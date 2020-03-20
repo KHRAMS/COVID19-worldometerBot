@@ -197,7 +197,7 @@ async def on_message(message):
                 print(df_st)
                 print(state_string)
                 print(df_st.iloc[:,0])
-                temp = df.loc[df_st.iloc[:,0] == state_string]
+                temp = df_st.loc[df_st.iloc[:,0] == state_string]
 
                 print(temp)
                 embed = discord.Embed(title = 'CoVID19 data for ' + state_string,
