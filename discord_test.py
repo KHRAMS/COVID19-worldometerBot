@@ -126,8 +126,8 @@ async def on_message(message):
                 embed.add_field(name = 'Critical Cases', value= str(temp['Serious,Critical'].item()))
                 embed.add_field(name = 'Total Cases per million', value= str(temp['Tot Cases/1M pop'].item()))
                 embed.add_field(name = 'Closed Cases', value= str(temp['TotalCases'].item() - temp['ActiveCases'].item()))
-                embed.add_field(name = 'Death/Closed Case%', value= str((temp['TotalDeaths'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)+ "%")
-                embed.add_field(name = 'Recovered/Closed Case%', value= str((temp['TotalRecovered'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100) + "%")
+                embed.add_field(name = 'Death/Closed Case%', value= "{0:.2f}".format((temp['TotalDeaths'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)+ "%")
+                embed.add_field(name = 'Recovered/Closed Case%', value= "{0:.2f}".format(((temp['TotalRecovered'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)) + "%")
                 # to_send+= "There are " + str(temp['NewCases'].item()) + " new cases in " + temp['Country,Other'].item()
                 msg =  ""
 
