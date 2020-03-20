@@ -199,11 +199,11 @@ async def on_message(message):
                 # print(jsonFile[0])
                 # print(jsonFile)
                 for i in jsonFile:
-                    # print(i['url'])
+                    print(i['url'])
                     # print(i[])mport datetime
 
 
-                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title="Breaking News", description= "["+i['title']+"]("+i['url']+")", url= i['url'], author=i['website']['name'], colour =discord.Colour.blue())
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title="Breaking News", description= "["+i['title']+"]("+i['url']+")", url= i['url'], author="author", colour =discord.Colour.blue())
                     # tempbed.set_footer(text=i['highlight'])
 
                     await message.channel.send(msg, embed =tempbed )
