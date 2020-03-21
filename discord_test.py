@@ -175,7 +175,7 @@ async def on_message(message):
         if(cmd[1].lower() == 'stat'):
 
             if(len(cmd) ==3):
-                temp = df_countr[pd.Series(df_countr['Country,Other']).str.match(cmd[2], case=False).values]
+                temp = df_countr[df_countr['Country,Other'].lower() == cmd[2].lower()]
                 print(temp)
                 embed = discord.Embed(title = 'CoVID19 data for ' + temp['Country,Other'].item(),
                                         colour =discord.Colour.blue())
