@@ -10,6 +10,21 @@ from bs4 import BeautifulSoup
 import urllib.request
 import re
 import datetime
+import matplotlib.pyplot as plt
+import csv
+url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv'
+download = r.get(url)
+
+decoded_content = download.content.decode('utf-8')
+
+cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+with open('time_series_19-covid-Confirmed.csv','w')as f:
+    # for row in cr:
+    writer = csv.writer(f)
+    writer.writerows(cr)
+
+df_JHU = pd.read_csv('time_series_19-covid-Confirmed.csv', header=0)
+# print(df_JHU)
 
 req = urllib.request.urlopen('https://www.worldometers.info/coronavirus')
 page = BeautifulSoup(req.read().decode('utf8'), 'html.parser')
@@ -175,7 +190,10 @@ async def on_message(message):
         if(cmd[1].lower() == 'stat'):
 
             if(len(cmd) ==3):
-                temp = df_countr[pd.Series(df_countr['Country,Other']).str.match(cmd[2], case=False).values]
+                if('-' in cmd[2].lower()):
+                    cmd[2] = cmd[2].replace("-", " ")
+                temp = df_countr[pd.Series(df_countr['Country,Other']).str.lower().str.endswith(cmd[2].lower()).values]
+                # print(df_countr)
                 #@TODOFigure out how to fix $c stat uk edge case
                 #potentially using a temp = df_countr.loc[df_countr['Country,Other'].lower() == cmd[2].lower()] variant
 
@@ -183,7 +201,7 @@ async def on_message(message):
                 embed = discord.Embed(title = 'CoVID19 data for ' + temp['Country,Other'].item(),
                                         colour =discord.Colour.blue())
                 embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category. Nones aren't necessarily 0s! There just might not be data for a category.")
-                print(temp)
+                # print(temp)
                 # embed.set_author(name= 'CoVID19-Analytics')
                 embed.add_field(name = 'Total Cases', value= str(temp['TotalCases'].item())+ "(+"+ str(temp['NewCases'].item()) + ")")
                 embed.add_field(name = 'Total Deaths', value= str(temp['TotalDeaths'].item())+ "(+"+ str(temp['NewDeaths'].item()) + ")")
@@ -192,34 +210,46 @@ async def on_message(message):
                 embed.add_field(name = 'Critical Cases', value= str(temp['Serious,Critical'].item()))
                 embed.add_field(name = 'Total Cases per million', value= str(temp['Tot Cases/1M pop'].item()))
                 embed.add_field(name = 'Closed Cases', value= str(temp['TotalCases'].item() - temp['ActiveCases'].item()))
-                embed.add_field(name = 'Death/Closed Case%', value= "{0:.2f}".format((temp['TotalDeaths'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)+ "%")
-                embed.add_field(name = 'Recovered/Closed Case%', value= "{0:.2f}".format(((temp['TotalRecovered'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)) + "%")
+                if((temp['TotalDeaths'].item() is not None) and (temp['ActiveCases'].item() is not None) and (temp['TotalCases'].item() is not None)):
+                    embed.add_field(name = 'Death/Closed Case%', value= "{0:.2f}".format((temp['TotalDeaths'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)+ "%")
+                    embed.add_field(name = 'Recovered/Closed Case%', value= "{0:.2f}".format(((temp['TotalRecovered'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)) + "%")
                 # to_send+= "There are " + str(temp['NewCases'].item()) + " new cases in " + temp['Country,Other'].item()
                 msg =  ""
                 await message.channel.send(msg, embed = embed)
-                response = r.get("https://api.newsriver.io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22%20AND%20language%3AEN&sortBy=discoverDate&sortOrder=DESC&limit=2", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
-                # print(response.text)
-                jsonFile = response.json()
-                # print(jsonFile[0])
-                # print(jsonFile)
-                for i in jsonFile:
-                    # print(i['url'])
-                    # print(i[])mport datetime
-                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['discoverDate'], "%Y-%m-%dT%H:%M:%S.%f+0000"),title="", description= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
+
+
+
+                response = r.get('https://gnews.io/api/v3/search?q=coronavirus%20' + temp['Country,Other'].item().replace(" ","%20") + '%20&max=2&token=f01762ab40f3592f25157bf8274421fa')
+                # print(response)
+                # print(response.json())
+                for i in response.json()['articles']:
+
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishedAt'], "%Y-%m-%d %H:%M:%S UTC"),title="", description= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
                     # tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title=i['title'], url=i['url'],  colour =discord.Colour.blue())
                     # tempbed.set_footer(text=i['highlight'])
-                    tempbed.set_footer(text=i['website']['name'])
+                    tempbed.set_footer(text=i['source']['name'])
                     await message.channel.send(msg, embed =tempbed )
-                # await message.channel.send(msg, embed = embed)
-                # await message.channel.send(msg, embed = embed)
-                # await message.channel.send(msg, embed = embed)
+
+                # USING NEWSRIVER to get news and send embed -->
+                # response = r.get("https://api.newsriver.io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22%20AND%20language%3AEN&sortBy=discoverDate&sortOrder=DESC&limit=2", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
+                # print('hi, this might be taking some time!')
+                # jsonFile = response.json()
+                #
+                # for i in jsonFile:
+                #
+                #     tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['discoverDate'], "%Y-%m-%dT%H:%M:%S.%f+0000"),title="", description= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
+                #     # tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title=i['title'], url=i['url'],  colour =discord.Colour.blue())
+                #     # tempbed.set_footer(text=i['highlight'])
+                #     tempbed.set_footer(text=i['website']['name'])
+                #     await message.channel.send(msg, embed =tempbed )
+
 
             elif(len(cmd) == 4):
                 df_st = df_state_dict.get(cmd[2].lower())
                 state_string = abbrev_us_state.get(cmd[3].lower())
-                print(df_st)
-                print(state_string)
-                print(df_st.iloc[:,0])
+                # print(df_st)
+                # print(state_string)
+                # print(df_st.iloc[:,0])
                 temp = df_st.loc[df_st.iloc[:,0] == state_string]
 
                 print(temp)
@@ -234,7 +264,18 @@ async def on_message(message):
                 embed.add_field(name = 'Active Cases', value= str(temp['ActiveCases'].item()))
                 msg =  ""
                 await message.channel.send(msg, embed = embed)
+                print(cmd[2].lower().replace(" ","%20") + "%20" +  state_string.replace(" ","%20"))
+                response = r.get('https://gnews.io/api/v3/search?q=coronavirus%20' +  state_string.replace(" ","%20") + '%20&max=2&token=f01762ab40f3592f25157bf8274421fa')
+                #WITH COUNTRY NAME-->
+                # response = r.get('https://gnews.io/api/v3/search?q=coronavirus%20' + cmd[2].lower().replace(" ","%20") + "%20" +  state_string.replace(" ","%20") + '%20&max=2&token=f01762ab40f3592f25157bf8274421fa')
+                print(response.json())
+                for i in response.json()['articles']:
 
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishedAt'], "%Y-%m-%d %H:%M:%S UTC"),title="", description= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
+                    # tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title=i['title'], url=i['url'],  colour =discord.Colour.blue())
+                    # tempbed.set_footer(text=i['highlight'])
+                    tempbed.set_footer(text=i['source']['name'])
+                    await message.channel.send(msg, embed =tempbed )
             else:
                 embed=None
                 await message.channel.send(msg, embed = embed)
