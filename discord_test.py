@@ -175,8 +175,11 @@ async def on_message(message):
         if(cmd[1].lower() == 'stat'):
 
             if(len(cmd) ==3):
-                temp = df_countr[df_countr['Country,Other'].lower() == cmd[2].lower()]
-                print(temp)
+                temp = df_countr[pd.Series(df_countr['Country,Other']).str.match(cmd[2], case=False).values]
+                #@TODOFigure out how to fix $c stat uk edge case
+                #potentially using a temp = df_countr.loc[df_countr['Country,Other'].lower() == cmd[2].lower()] variant
+
+
                 embed = discord.Embed(title = 'CoVID19 data for ' + temp['Country,Other'].item(),
                                         colour =discord.Colour.blue())
                 embed.set_footer(text="This data was taken from https://www.worldometers.info/coronavirus. Numbers in the (+...) show new cases in that category. Nones aren't necessarily 0s! There just might not be data for a category.")
