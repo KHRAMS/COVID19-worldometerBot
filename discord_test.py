@@ -201,7 +201,7 @@ async def on_message(message):
                 for i in jsonFile:
                     # print(i['url'])
                     # print(i[])mport datetime
-                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['discoverDate'], "%Y-%m-%dT%H:%M:%S"),title="", description= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['discoverDate'], "%Y-%m-%dT%H:%M:%S.%f"),title="", description= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
                     # tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title=i['title'], url=i['url'],  colour =discord.Colour.blue())
                     # tempbed.set_footer(text=i['highlight'])
                     tempbed.set_footer(text=i['website']['name'])
