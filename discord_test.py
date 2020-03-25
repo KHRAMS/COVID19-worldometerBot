@@ -287,7 +287,7 @@ async def on_message(message):
                 # embed.set_author(name= 'CoVID19-Analytics')
                 embed.add_field(name = 'Total Cases', value= str(temp['TotalCases'].item())+ "(+"+ str(temp['NewCases'].item()) + ")")
                 embed.add_field(name = 'Total Deaths', value= str(temp['TotalDeaths'].item())+ "(+"+ str(temp['NewDeaths'].item()) + ")")
-                embed.add_field(name = 'Total Recovered', value= str(temp['TotalRecovered'].item()))
+                # embed.add_field(name = 'Total Recovered', value= str(temp['TotalRecovered'].item()))
                 embed.add_field(name = 'Active Cases', value= str(temp['ActiveCases'].item()))
                 msg =  ""
                 await message.channel.send(msg, embed = embed)
