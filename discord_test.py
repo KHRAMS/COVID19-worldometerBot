@@ -12,19 +12,46 @@ import re
 import datetime
 import matplotlib.pyplot as plt
 import csv
-url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv'
+url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
 download = r.get(url)
-
 decoded_content = download.content.decode('utf-8')
 
 cr = csv.reader(decoded_content.splitlines(), delimiter=',')
-with open('time_series_19-covid-Confirmed.csv','w')as f:
+with open('time_series_covid19_confirmed_global.csv','w')as f:
     # for row in cr:
     writer = csv.writer(f)
     writer.writerows(cr)
 
-df_JHU = pd.read_csv('time_series_19-covid-Confirmed.csv', header=0)
-# print(df_JHU)
+df_JHU = pd.read_csv("time_series_covid19_confirmed_global.csv", header=0)
+
+x_val = 0;
+JHU_countries = df_JHU['Country/Region'].unique()
+#print(countries)
+dictOfCountries = {}
+#dictOfCountries = {i : countries[i] for i in range(0, len(countries))}
+for i in range(0, len(JHU_countries)):
+    if(JHU_countries[i].lower()=='us'):
+        dictOfCountries['usa'] = i
+    else:
+        dictOfCountries[JHU_countries[i].lower()] = i
+# print(dictOfCountries)
+
+
+listCountries = []
+listCountriesSum = []
+for i in range(0, len(JHU_countries)):
+    temp = df_JHU[(df_JHU['Country/Region'] == JHU_countries[i])].drop(['Lat','Long'],axis=1)
+    listCountries.append(temp)
+
+    listCountriesSum.append(temp.sum(numeric_only=True).to_frame().T)
+    listCountriesSum[i].insert(0, 'Country', [JHU_countries[i]], True)
+
+world = df_JHU.sum(0)
+# print(world)
+# print(len(listCountries))
+dictOfCountries['world'] = len(listCountries)
+
+
 
 req = urllib.request.urlopen('https://www.worldometers.info/coronavirus')
 page = BeautifulSoup(req.read().decode('utf8'), 'html.parser')
@@ -44,17 +71,17 @@ for i in page.table.tbody.find_all('tr'):
     data = []
 
     data.append(row[0].text.lstrip().rstrip())
-
-    for j in row[1:-1]:
+    # print(row[-2:])
+    for j in row[1:-2]:
         if not j.text.strip():
             data.append(None)
         else:
             data.append(int(re.sub('[\s+,]', '', j.text)))
-
-    if not row[-1].text:
-        data.append(None)
-    else:
-        data.append(float(re.sub('[\s+,]', '', row[-1].text)))
+    for j in row[-2:]:
+        if not row[-1].text:
+            data.append(None)
+        else:
+            data.append(float(re.sub('[\s+,]', '', j.text)))
 
     country_name = data[0]
     countries.append(data)
@@ -231,7 +258,7 @@ async def on_message(message):
                     await message.channel.send(msg, embed =tempbed )
 
                 # USING NEWSRIVER to get news and send embed -->
-                # response = r.get("https://api.newsriver.io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22%20AND%20language%3AEN&sortBy=discoverDate&sortOrder=DESC&limit=2", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
+                # response = r.get("https://api.newsriver.`io/v2/search?query=text%3A%22coronavirus%20" + temp['Country,Other'].item() + "%22%20AND%20language%3AEN&sortBy=discoverDate&sortOrder=DESC&limit=2", headers={"Authorization":"sBBqsGXiYgF0Db5OV5tAw3BRlHPKxnhbzMtWmJE8q2KoXUsZ0bCbO-rG-wzTnwsnn2pHZrSf1gT2PUujH1YaQA"})
                 # print('hi, this might be taking some time!')
                 # jsonFile = response.json()
                 #
@@ -280,6 +307,50 @@ async def on_message(message):
                 embed=None
                 await message.channel.send(msg, embed = embed)
 
+        elif (cmd[1].lower() == 'jstat'):
+            if(len(cmd) ==3):
+                if('-' in cmd[2].lower()):
+                    cmd[2] = cmd[2].replace("-", " ")
+                    # temp = df_countr[pd.Series(df_countr['Country,Other']).str.lower().str.endswith(cmd[2].lower()).values]
+                temp = listCountriesSum[dictOfCountries.get(cmd[2])]
+
+                # print(df_countr)
+                #@TODOFigure out how to fix $c stat uk edge case
+                #potentially using a temp = df_countr.loc[df_countr['Country,Other'].lower() == cmd[2].lower()] variant
+                # print(temp)
+                # print(temp.iloc[:,-1])
+
+                embed = discord.Embed(title = 'CoVID19 data for ' + temp['Country'].item(),
+                                        colour =discord.Colour.blue())
+                embed.set_footer(text="This data was taken from github.com/CSSEGISandData/COVID-19 operated by JHU. Numbers in the (+...) show new cases in that category. Nones aren't necessarily 0s! There just might not be data for a category.")
+                # print(temp)
+                # embed.set_author(name= 'CoVID19-Analytics')
+                embed.add_field(name = 'Total Cases', value= str(temp.iloc[:,-1].item())+ "(+"+ str(temp.iloc[:,-1].item()-temp.iloc[:,-2].item()) + ")")
+                # embed.add_field(name = 'Total Deaths', value= str(temp['TotalDeaths'].item())+ "(+"+ str(temp['NewDeaths'].item()) + ")")
+                # embed.add_field(name = 'Total Recovered', value= str(temp['TotalRecovered'].item()))
+                # embed.add_field(name = 'Active Cases', value= str(temp['ActiveCases'].item()))
+                # embed.add_field(name = 'Critical Cases', value= str(temp['Serious,Critical'].item()))
+                # embed.add_field(name = 'Total Cases per million', value= str(temp['Tot Cases/1M pop'].item()))
+                # embed.add_field(name = 'Closed Cases', value= str(temp['TotalCases'].item() - temp['ActiveCases'].item()))
+                # if((temp['TotalDeaths'].item() is not None) and (temp['ActiveCases'].item() is not None) and (temp['TotalCases'].item() is not None)):
+                #     embed.add_field(name = 'Death/Closed Case%', value= "{0:.2f}".format((temp['TotalDeaths'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)+ "%")
+                #     embed.add_field(name = 'Recovered/Closed Case%', value= "{0:.2f}".format(((temp['TotalRecovered'].item()/(temp['TotalCases'].item() - temp['ActiveCases'].item()))*100)) + "%")
+                # to_send+= "There are " + str(temp['NewCases'].item()) + " new cases in " + temp['Country,Other'].item()
+                msg =  ""
+                await message.channel.send(msg, embed = embed)
+
+
+
+                response = r.get('https://gnews.io/api/v3/search?q=coronavirus%20' + temp['Country'].item().replace(" ","%20") + '%20&max=2&token=f01762ab40f3592f25157bf8274421fa')
+                print(response)
+                print(response.json())
+                for i in response.json()['articles']:
+
+                    tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishedAt'], "%Y-%m-%d %H:%M:%S UTC"),title="", description= "["+i['title']+"]("+i['url']+")",  colour =discord.Colour.blue())
+                    # tempbed=discord.Embed(timestamp= datetime.datetime.strptime(i['publishDate'], "%Y-%m-%dT%H:%M:%S"), title=i['title'], url=i['url'],  colour =discord.Colour.blue())
+                    # tempbed.set_footer(text=i['highlight'])
+                    tempbed.set_footer(text=i['source']['name'])
+                    await message.channel.send(msg, embed =tempbed )
 @client.event
 async def on_ready():
     print('Logged in as')
