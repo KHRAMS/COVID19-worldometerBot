@@ -356,7 +356,7 @@ async def on_message(message):
 
 
 @tasks.loop(seconds=3)
-async def change_status():
+async def update_data():
     print('hi')
 
 @client.event
@@ -365,5 +365,5 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-
+update_data.start()
 client.run(TOKEN)
