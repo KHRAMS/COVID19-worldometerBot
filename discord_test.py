@@ -355,9 +355,93 @@ async def on_message(message):
                     await message.channel.send(msg, embed =tempbed )
 
 
-@tasks.loop(seconds=3)
+@tasks.loop(seconds=1000)
 async def update_data():
-    print('hi')
+    print("UPDATING DATA!")
+    req = urllib.request.urlopen('https://www.worldometers.info/coronavirus')
+    page = BeautifulSoup(req.read().decode('utf8'), 'html.parser')
+    country_name = ""
+    states = []
+    df_state_dict = {}
+    count = 0
+    countries = []
+    for i in page.table.thead.find_all('tr'):
+        data = [j.text.lstrip().rstrip() for j in i.find_all('th')]
+
+        countries.append(data)
+
+    for i in page.table.tbody.find_all('tr'):
+        row = i.find_all('td')
+
+        data = []
+
+        data.append(row[0].text.lstrip().rstrip())
+        # print(row[-2:])
+        for j in row[1:-2]:
+            if not j.text.strip():
+                data.append(None)
+            else:
+                data.append(int(re.sub('[\s+,]', '', j.text)))
+        for j in row[-2:]:
+            if not row[-1].text:
+                data.append(None)
+            else:
+                data.append(float(re.sub('[\s+,]', '', j.text)))
+
+        country_name = data[0]
+        countries.append(data)
+
+        if(i.a != None):
+          req = urllib.request.urlopen("https://www.worldometers.info/coronavirus/" + i.a.get('href'))
+         # soup_det =  BeautifulSoup(y.text, 'html.parser')
+
+
+          page = BeautifulSoup(req.read().decode('utf8'), 'html.parser')
+
+          if page.table is not None:
+            for i in page.table.thead.find_all('tr'):
+                data = [j.text.lstrip().rstrip() for j in i.find_all('th')]
+                states.append(data)
+
+            for i in page.table.tbody.find_all('tr'):
+                state = i.find_all('td')[0].text.lstrip().rstrip()
+                data = []
+                for j in i.find_all('td')[1:]:
+                    if not j.text.strip():
+                        data.append(None)
+                    else:
+                        data.append(re.sub('[^0123456789]', '', j.text))
+                        #                  '[^0123456789]' to remove non-digits
+                        #                  '[\s+,]' to remove whitespace, plus, comma
+                        #                  '[\s+]' to remove whitespace, plus
+
+                states.append([state] + data)
+
+            df_state = pd.DataFrame(states)
+            new_header = df_state.iloc[0] #grab the first row for the header
+            df_state = df_state[1:] #take the data less the header row
+            df_state.columns = new_header #set the header row as the df header
+            df_state.set_index(df_state.columns[0],inplace=True)
+            df_state.reset_index(inplace=True)
+           # print(df_state)
+            df_state_dict[country_name.lower()] = df_state
+
+
+    df_countr = pd.DataFrame(countries)
+    new_header = df_countr.iloc[0]
+    df_countr = df_countr[1:]
+    df_countr.columns = new_header
+    df_countr.set_index(df_countr.columns[0], inplace=True)
+    # This would also work, but keeps it as series
+      # total_countr = df_countr.sum(0).to_frame()
+      # total_countr.iat[0,0] = 'World'
+      # print(total_countr)
+      # total_countr.at["Country,Other", 0] = "World"
+      # print(total_countr)
+    temp = df_countr.sum(0).tolist()
+    temp[len(temp)-1] = None
+    df_countr.loc["World"]  = temp
+    df_countr.reset_index(inplace=True)
 
 @client.event
 async def on_ready():
