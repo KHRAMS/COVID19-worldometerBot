@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import csv
 from discord.ext import commands, tasks
 
+
 url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
 download = r.get(url)
 decoded_content = download.content.decode('utf-8')
@@ -59,7 +60,8 @@ req = urllib.request.urlopen('https://www.worldometers.info/coronavirus')
 page = BeautifulSoup(req.read().decode('utf8'), 'html.parser')
 country_name = ""
 states = []
-df_state_dict = {}
+
+df_state_dict={}
 count = 0
 countries = []
 for i in page.table.thead.find_all('tr'):
@@ -355,9 +357,11 @@ async def on_message(message):
                     await message.channel.send(msg, embed =tempbed )
 
 
-@tasks.loop(seconds=1000)
+@tasks.loop(seconds=300)
 async def update_data():
-    print("UPDATING DATA!")
+    global df_state_dict
+    global df_countr
+    print("UPDATING DATA start")
     req = urllib.request.urlopen('https://www.worldometers.info/coronavirus')
     page = BeautifulSoup(req.read().decode('utf8'), 'html.parser')
     country_name = ""
@@ -442,6 +446,7 @@ async def update_data():
     temp[len(temp)-1] = None
     df_countr.loc["World"]  = temp
     df_countr.reset_index(inplace=True)
+    print("UPDATING DATA FIN")
 
 @client.event
 async def on_ready():
