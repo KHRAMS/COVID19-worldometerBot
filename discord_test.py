@@ -12,6 +12,8 @@ import re
 import datetime
 import matplotlib.pyplot as plt
 import csv
+from discord.ext import commands, tasks
+
 url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
 download = r.get(url)
 decoded_content = download.content.decode('utf-8')
@@ -351,6 +353,12 @@ async def on_message(message):
                     # tempbed.set_footer(text=i['highlight'])
                     tempbed.set_footer(text=i['source']['name'])
                     await message.channel.send(msg, embed =tempbed )
+
+
+@tasks.loop(seconds=3)
+async def change_status():
+    print('hi')
+
 @client.event
 async def on_ready():
     print('Logged in as')
